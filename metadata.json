@@ -1,0 +1,10 @@
+{
+  "name": "Mock Versant Test",
+  "description": "A minimal, clean mock English test platform with audio recording and silence detection.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
