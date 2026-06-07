@@ -2,7 +2,82 @@ import { useState, useEffect, useRef } from 'react';
 import { generateRandomExam } from '../data/questions';
 import { QuestionPhase, TestResult, Question } from '../types';
 import { playTTS, playBeep, SilenceDetector } from '../lib/audioUtils';
-import { Mic, Loader2, PlayCircle, EyeOff, CheckCircle, ArrowRight, BookOpen, Compass, Award } from 'lucide-react';
+import { Mic, Loader2, PlayCircle, EyeOff, CheckCircle, ArrowRight, BookOpen, Compass, Award, Play, Volume2 } from 'lucide-react';
+
+interface DemoConfig {
+  promptAudioText: string;
+  promptDisplayText?: string;
+  responseType: 'speaking' | 'writing';
+  responseDemoText: string;
+  explanation: string;
+}
+
+const SECTION_DEMOS: Record<string, DemoConfig> = {
+  'part-a': {
+    promptAudioText: "Please read the text aloud.",
+    promptDisplayText: "The library remains open until midnight.",
+    responseType: 'speaking',
+    responseDemoText: "The library remains open until midnight.",
+    explanation: "Read the displayed sentence aloud as soon as you hear the beep."
+  },
+  'part-b': {
+    promptAudioText: "She decided to walk to work today.",
+    responseType: 'speaking',
+    responseDemoText: "She decided to walk to work today.",
+    explanation: "Listen to the sentence (the text is hidden during the test) and repeat it exactly."
+  },
+  'part-c': {
+    promptAudioText: "in the park ... the dog ... was running",
+    responseType: 'speaking',
+    responseDemoText: "The dog was running in the park.",
+    explanation: "Rearrange the spoken jumbled phrases into a single correct sentence."
+  },
+  'part-d': {
+    promptAudioText: "Person one: I need a pen. Person two: Here is one. Where is the pen?",
+    responseType: 'speaking',
+    responseDemoText: "On the desk.",
+    explanation: "Listen to the short dialogue, and answer the question with a simple phrase."
+  },
+  'part-e': {
+    promptAudioText: "",
+    promptDisplayText: "The quick brown fox jumps over the lazy dog.",
+    responseType: 'writing',
+    responseDemoText: "The quick brown fox jumps over the lazy dog.",
+    explanation: "Copy the displayed paragraph exactly. Speed and spelling count."
+  },
+  'part-f': {
+    promptAudioText: "",
+    promptDisplayText: "Please ________ the door when you leave.",
+    responseType: 'writing',
+    responseDemoText: "lock",
+    explanation: "Type a single missing word that best completes the sentence."
+  },
+  'part-g': {
+    promptAudioText: "Submit the required forms by Friday.",
+    responseType: 'writing',
+    responseDemoText: "Submit the required forms by Friday.",
+    explanation: "Listen to the sentence and type exactly what you hear."
+  },
+  'part-h': {
+    promptAudioText: "",
+    promptDisplayText: "The project was a success. The team completed the goals on time.",
+    responseType: 'writing',
+    responseDemoText: "The project succeeded and the team met their goals on time.",
+    explanation: "Read the passage for 30 seconds, then type a reconstruction of it in your own words."
+  },
+  'part-i': {
+    promptAudioText: "Some schools propose year-round classes with short breaks. What is your opinion?",
+    responseType: 'speaking',
+    responseDemoText: "I believe year-round classes help students stay focused and retain information better.",
+    explanation: "Listen to the passage, summarize it, and express your opinion with reasons."
+  },
+  'part-j': {
+    promptAudioText: "High-quality audio is essential for processing.",
+    responseType: 'speaking',
+    responseDemoText: "High-quality audio is essential for processing.",
+    explanation: "Diagnostic Repeat: Listen to the check sentence and repeat it exactly."
+  }
+};
 
 interface TestEngineProps {
   onComplete: (results: TestResult[]) => void;
@@ -21,6 +96,75 @@ export default function TestEngine({ onComplete, targetSectionId }: TestEnginePr
   // Storage
   const [results, setResults] = useState<TestResult[]>([]);
   const [currentText, setCurrentText] = useState('');
+
+  // Interactive Demo State
+  const [demoState, setDemoState] = useState<'idle' | 'playing-prompt' | 'beeping' | 'response' | 'completed'>('idle');
+  const [demoTypedResponse, setDemoTypedResponse] = useState('');
+  const isDemoRunningRef = useRef(false);
+
+  const cancelDemo = () => {
+    isDemoRunningRef.current = false;
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    setDemoState('idle');
+    setDemoTypedResponse('');
+  };
+
+  const startDemo = async () => {
+    const config = SECTION_DEMOS[currentSection.id];
+    if (!config) return;
+
+    cancelDemo();
+    isDemoRunningRef.current = true;
+    
+    // 1. Play Prompt Phase
+    setDemoState('playing-prompt');
+    if (config.promptAudioText) {
+      await playTTS(config.promptAudioText);
+    } else {
+      await new Promise(r => setTimeout(r, 2500));
+    }
+    
+    if (!isDemoRunningRef.current) return;
+
+    // 2. Beep Phase (for speaking parts)
+    setDemoState('beeping');
+    if (config.responseType === 'speaking') {
+      await playBeep();
+    } else {
+      await new Promise(r => setTimeout(r, 500));
+    }
+
+    if (!isDemoRunningRef.current) return;
+
+    // 3. Response Phase
+    setDemoState('response');
+    if (config.responseType === 'writing') {
+      const text = config.responseDemoText;
+      for (let i = 0; i <= text.length; i++) {
+        if (!isDemoRunningRef.current) return;
+        setDemoTypedResponse(text.slice(0, i));
+        await new Promise(r => setTimeout(r, 50));
+      }
+    } else {
+      await new Promise(r => setTimeout(r, 2500));
+    }
+
+    if (!isDemoRunningRef.current) return;
+
+    // 4. Completed
+    setDemoState('completed');
+  };
+
+  // Auto cancel demo when changing sections or entering test phase
+  useEffect(() => {
+    cancelDemo();
+    return () => {
+      isDemoRunningRef.current = false;
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    };
+  }, [secIdx, showSectionIntro]);
 
   // Media
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -377,6 +521,127 @@ export default function TestEngine({ onComplete, targetSectionId }: TestEnginePr
                     </div>
                   </div>
                 )}
+
+                {/* Interactive Demo Section */}
+                <div className="border border-neutral-200 bg-neutral-50/50 p-6 rounded-md mb-8">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-black mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                    Interactive Section Demo
+                  </h4>
+                  <p className="text-xs text-neutral-500 mb-4 leading-relaxed font-sans">
+                    Watch or listen to a simulated question item to understand how the audio, visual indicators, and response window behave in this section.
+                  </p>
+                  
+                  {demoState === 'idle' ? (
+                    <button
+                      onClick={startDemo}
+                      className="flex items-center gap-2 px-4 py-2.5 bg-white border border-neutral-900 hover:bg-black hover:text-white text-black text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer font-sans"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-current" />
+                      <span>Play Section Demo</span>
+                    </button>
+                  ) : (
+                    <div className="bg-white border border-neutral-200 rounded p-4 space-y-4">
+                      {/* Step Status */}
+                      <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                        <span className="text-[10px] font-mono uppercase font-bold text-neutral-400">Demo Progress</span>
+                        <span className="text-[9px] font-bold bg-neutral-100 px-2 py-0.5 uppercase tracking-wider text-neutral-800 rounded font-mono">
+                          {demoState === 'playing-prompt' && "🔊 Playing Prompt"}
+                          {demoState === 'beeping' && "🔔 Beep Signal"}
+                          {demoState === 'response' && "⏳ Simulating Response"}
+                          {demoState === 'completed' && "✅ Demo Complete"}
+                        </span>
+                      </div>
+
+                      {/* Demo Display Screen */}
+                      <div className="min-h-[100px] flex flex-col items-center justify-center text-center p-4 bg-neutral-50 border border-neutral-100 rounded">
+                        {demoState === 'playing-prompt' && (
+                          <div className="space-y-3">
+                            <p className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase font-mono">PROMPT PHASE</p>
+                            {SECTION_DEMOS[currentSection.id]?.promptDisplayText ? (
+                              <p className="text-sm font-serif italic text-black font-semibold">
+                                "{SECTION_DEMOS[currentSection.id].promptDisplayText}"
+                              </p>
+                            ) : (
+                              <div className="flex flex-col items-center gap-2">
+                                <p className="text-sm font-serif italic text-neutral-500 font-semibold">🔊 Audio playing... (text hidden)</p>
+                                <div className="flex items-center gap-1 mt-1 justify-center">
+                                  <span className="w-1.5 h-4 bg-neutral-400 animate-pulse rounded-full"></span>
+                                  <span className="w-1.5 h-6 bg-neutral-600 animate-pulse delay-75 rounded-full"></span>
+                                  <span className="w-1.5 h-3 bg-neutral-500 animate-pulse delay-150 rounded-full"></span>
+                                  <span className="w-1.5 h-5 bg-neutral-600 animate-pulse delay-200 rounded-full"></span>
+                                  <span className="w-1.5 h-2 bg-neutral-400 animate-pulse delay-300 rounded-full"></span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {demoState === 'beeping' && (
+                          <div className="flex flex-col items-center gap-2">
+                            <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest animate-pulse font-mono">🔔 BEEP!</span>
+                            <p className="text-xs text-neutral-500 mt-1 font-sans">Speaker plays a tone indicating response window is active.</p>
+                          </div>
+                        )}
+
+                        {demoState === 'response' && (
+                          <div className="w-full max-w-md space-y-3">
+                            <p className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase font-mono">RESPONSE PHASE</p>
+                            {SECTION_DEMOS[currentSection.id]?.responseType === 'speaking' ? (
+                              <div className="flex flex-col items-center gap-2">
+                                <div className="flex items-center gap-2 px-3 py-1 bg-red-50 border border-red-200 rounded-full text-red-600 text-[9px] font-bold uppercase tracking-widest animate-pulse">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-red-600"></span>
+                                  Simulated Speak Active
+                                </div>
+                                <p className="text-sm font-serif italic text-neutral-800 font-semibold mt-1">
+                                  "{SECTION_DEMOS[currentSection.id].responseDemoText}"
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="space-y-2 text-left">
+                                <p className="text-[9px] font-bold uppercase tracking-wider text-neutral-400 font-mono">Simulated Typing:</p>
+                                <input
+                                  readOnly
+                                  type="text"
+                                  className="w-full px-3 py-2 border border-neutral-300 bg-white text-xs font-mono rounded focus:outline-none"
+                                  value={demoTypedResponse}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {demoState === 'completed' && (
+                          <div className="space-y-2">
+                            <p className="text-xs text-neutral-700 font-bold font-sans">Ready to start the section!</p>
+                            <p className="text-[10px] text-neutral-400 leading-relaxed max-w-xs mx-auto font-sans">
+                              {SECTION_DEMOS[currentSection.id]?.explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Demo Controls */}
+                      <div className="flex justify-between items-center gap-2">
+                        <button
+                          onClick={cancelDemo}
+                          className="px-3 py-1.5 border border-neutral-200 hover:bg-neutral-50 text-neutral-500 hover:text-black text-[9px] font-bold uppercase tracking-widest transition-all cursor-pointer font-sans"
+                        >
+                          Cancel Demo
+                        </button>
+                        
+                        {demoState === 'completed' && (
+                          <button
+                            onClick={startDemo}
+                            className="px-3 py-1.5 bg-neutral-900 text-white text-[9px] font-bold uppercase tracking-widest transition-all hover:bg-black cursor-pointer animate-fade-in font-sans"
+                          >
+                            Play Again
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Action Button */}
