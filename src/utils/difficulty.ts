@@ -20,34 +20,44 @@ export function adaptQuestionForDifficulty(
   // Helper to slice or pad a simple sentence to a target word count range
   const formatSentenceLength = (text: string, targetWords: number): string => {
     const cleanText = text.replace(/[.!?]/g, '').trim();
-    const words = cleanText.split(/\s+/);
+    let words = cleanText.split(/\s+/).filter(w => w.length > 0);
     
     if (difficulty === 'easy') {
-      // Return 5-6 words
+      // Return targetWords (e.g. 6 words)
       if (words.length > targetWords) {
         return words.slice(0, targetWords).join(' ') + '.';
       }
       return text;
     } else {
-      // Hard: Return 11-12 words
+      // Hard: Return targetWords (e.g. 11 words)
       if (words.length < targetWords) {
-        // Pad with contextual phrases
-        if (text.toLowerCase().includes('package')) words.push('by the courier today');
-        else if (text.toLowerCase().includes('walk')) words.push('instead of riding the bus');
-        else if (text.toLowerCase().includes('lights')) words.push('before exiting the building');
-        else if (text.toLowerCase().includes('project')) words.push('as soon as possible');
-        else if (text.toLowerCase().includes('satisfaction')) words.push('in every department');
-        else if (text.toLowerCase().includes('work')) words.push('for a long period');
-        else if (text.toLowerCase().includes('call')) words.push('without any further delay');
-        else if (text.toLowerCase().includes('files')) words.push('in the shared directory');
-        else if (text.toLowerCase().includes('oil')) words.push('due to global demand');
-        else if (text.toLowerCase().includes('payment')) words.push('due to system maintenance');
-        else if (text.toLowerCase().includes('seatbelt')) words.push('during the entire flight');
-        else if (text.toLowerCase().includes('meeting')) words.push('due to unforeseen conflicts');
-        else if (text.toLowerCase().includes('phone')) words.push('near the conference table');
-        else if (text.toLowerCase().includes('shoes')) words.push('at the department store');
-        else words.push('under the current circumstances');
+        // Pad with contextual phrases split into individual words
+        let padText = '';
+        if (text.toLowerCase().includes('package')) padText = 'by the courier today';
+        else if (text.toLowerCase().includes('walk')) padText = 'instead of riding the bus';
+        else if (text.toLowerCase().includes('lights')) padText = 'before exiting the building';
+        else if (text.toLowerCase().includes('project')) padText = 'as soon as possible';
+        else if (text.toLowerCase().includes('satisfaction')) padText = 'in every department';
+        else if (text.toLowerCase().includes('work')) padText = 'for a long period';
+        else if (text.toLowerCase().includes('call')) padText = 'without any further delay';
+        else if (text.toLowerCase().includes('files')) padText = 'in the shared directory';
+        else if (text.toLowerCase().includes('oil')) padText = 'due to global demand';
+        else if (text.toLowerCase().includes('payment')) padText = 'due to system maintenance';
+        else if (text.toLowerCase().includes('seatbelt')) padText = 'during the entire flight';
+        else if (text.toLowerCase().includes('meeting')) padText = 'due to unforeseen conflicts';
+        else if (text.toLowerCase().includes('phone')) padText = 'near the conference table';
+        else if (text.toLowerCase().includes('shoes')) padText = 'at the department store';
+        else padText = 'under the current circumstances';
+
+        const padWords = padText.split(/\s+/).filter(w => w.length > 0);
+        words.push(...padWords);
       }
+
+      // If still shorter than the target, pad with standard filler words
+      while (words.length < targetWords) {
+        words.push('indeed');
+      }
+
       return words.slice(0, targetWords).join(' ') + '.';
     }
   };

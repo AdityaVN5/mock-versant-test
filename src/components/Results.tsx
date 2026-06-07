@@ -67,7 +67,18 @@ export default function Results({ attempt, onBack, onNavigateToDiagnostics }: Re
 
         {/* Header */}
         <header className="border-b border-neutral-200 p-8 md:p-12">
-          <h1 className="text-4xl md:text-5xl font-serif italic tracking-tight mb-6">Versant 4 Skills Essential Test</h1>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <h1 className="text-4xl md:text-5xl font-serif italic tracking-tight">Versant 4 Skills Essential Test</h1>
+            {score.difficulty && (
+              <span className={`inline-block self-start md:self-auto text-[10px] font-mono uppercase font-bold tracking-widest px-3 py-1 border rounded ${
+                score.difficulty === 'easy' ? 'bg-emerald-50 text-emerald-800 border-emerald-250' :
+                score.difficulty === 'medium' ? 'bg-sky-50 text-sky-800 border-sky-250' :
+                'bg-fuchsia-50 text-fuchsia-800 border-fuchsia-250'
+              }`}>
+                {score.difficulty} difficulty
+              </span>
+            )}
+          </div>
           <p className="text-sm text-neutral-500 leading-relaxed max-w-3xl font-sans">
             Versant scores are aligned to the Global Scale of English (GSE). The GSE runs from 10 to 90, with clear statements of what a learner can achieve at any point on the scale.
           </p>

@@ -15,6 +15,7 @@ const INITIAL_ATTEMPT: Attempt = {
   listening: 73,
   reading: 62,
   writing: 62,
+  difficulty: 'medium',
   responses: [
     {
       questionId: 'a-1',
@@ -163,6 +164,7 @@ export default function App() {
       reading: aiReport.reading,
       writing: aiReport.writing,
       isPartJPractice: targetSectionId === 'part-j',
+      difficulty: difficulty,
       responses: aiReport.responses
     };
 

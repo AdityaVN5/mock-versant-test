@@ -23,14 +23,14 @@ export default function Dashboard({
       <div className="w-full bg-white border-x border-neutral-200 p-8 md:p-12 flex flex-col space-y-12 min-h-screen">
         
         {/* Header */}
-        <header className="border-b border-neutral-200 pb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <header className="border-b border-neutral-200 pb-8 flex flex-col md:flex-row md:items-center justify-start gap-8">
           <div>
             <h1 className="text-4xl font-serif italic tracking-tight">Versant English Placement Test Practice</h1>
             <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 mt-4 font-bold">Your English Proficiency Portal</p>
           </div>
           
           {/* Segmented Toggle Control */}
-          <div className="flex flex-col gap-1.5 shrink-0 select-none">
+          <div className="flex flex-col gap-1.5 shrink-0 select-none md:border-l md:border-neutral-200 md:pl-8">
             <span className="text-[9px] uppercase font-bold tracking-widest text-neutral-400 font-mono">Exam Difficulty</span>
             <div className="inline-flex rounded-md p-1 bg-neutral-100 border border-neutral-200">
               {(['easy', 'medium', 'hard'] as const).map((level) => {
@@ -134,15 +134,26 @@ export default function Dashboard({
                   <div key={att.id} className="bg-white border border-neutral-200 p-4 relative group hover:border-black transition-all">
                      <div className="flex justify-between items-start mb-2">
                        <div>
-                         <span className="text-[9px] font-sans font-bold text-neutral-500 uppercase tracking-wider bg-neutral-100 px-2 py-0.5">{att.isPartJPractice ? "Diagnostic Part J" : "Full Exam Practice"}</span>
-                         <div className="flex items-center gap-1.5 text-[10px] text-neutral-500 mt-2">
-                            <Calendar className="w-3 h-3 text-neutral-400" />
-                            <span>{att.date}</span>
+                         <div className="flex flex-wrap items-center gap-2 mb-1">
+                           <span className="text-[9px] font-sans font-bold text-neutral-500 uppercase tracking-wider bg-neutral-100 px-2 py-0.5">{att.isPartJPractice ? "Diagnostic Part J" : "Full Exam Practice"}</span>
+                           {att.difficulty && (
+                             <span className={`text-[9px] font-sans font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+                               att.difficulty === 'easy' ? 'bg-emerald-100 text-emerald-800' :
+                               att.difficulty === 'medium' ? 'bg-sky-100 text-sky-800' :
+                               'bg-fuchsia-100 text-fuchsia-800'
+                             }`}>
+                               {att.difficulty}
+                             </span>
+                           )}
                          </div>
+                         <div className="flex items-center gap-1.5 text-[10px] text-neutral-500 mt-2">
+                             <Calendar className="w-3 h-3 text-neutral-400" />
+                             <span>{att.date}</span>
+                          </div>
                        </div>
                        <div className="text-right">
-                         <span className="text-[10px] uppercase font-bold tracking-widest text-[#171717] block">GSE</span>
-                         <span className="text-lg font-serif italic font-bold">{att.overallScore}</span>
+                          <span className="text-[10px] uppercase font-bold tracking-widest text-[#171717] block">GSE</span>
+                          <span className="text-lg font-serif italic font-bold">{att.overallScore}</span>
                        </div>
                      </div>
                      <button

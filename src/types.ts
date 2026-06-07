@@ -60,6 +60,7 @@ export interface Attempt {
   reading: number;
   writing: number;
   isPartJPractice?: boolean;
+  difficulty?: 'easy' | 'medium' | 'hard';
   responses?: AttemptResponse[];
 }
 
