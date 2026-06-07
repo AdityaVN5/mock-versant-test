@@ -1,7 +1,3 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
-
 # Automated English Language Assessment: The Versant Practice Portal
 An Interactive Speech, Typing, and Writing Diagnostic Environment aligned with the Global Scale of English (GSE) and the Common European Framework of Reference (CEFR).
 

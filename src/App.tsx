@@ -186,6 +186,13 @@ export default function App() {
     window.location.hash = '#dashboard';
   };
 
+  const handleResetAttempts = () => {
+    if (window.confirm("Are you sure you want to clear all practice history? This action cannot be undone.")) {
+      setAttempts([]);
+      localStorage.removeItem('versant_attempts');
+    }
+  };
+
   return (
     <div className="h-screen bg-[var(--color-neutral-base)] text-[#171717] font-sans selection:bg-neutral-200 flex flex-col justify-between overflow-hidden">
       <div className={`flex-1 flex flex-col min-h-0 ${status === 'testing' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
@@ -196,7 +203,7 @@ export default function App() {
           <>
             {status === 'login' && <Login onLogin={handleLogin} />}
             
-            {status === 'dashboard' && (
+             {status === 'dashboard' && (
               <Dashboard 
                 onStart={() => handleStartExam(undefined)} 
                 onStartDiagnostic={() => handleStartExam('part-j')}
@@ -204,6 +211,7 @@ export default function App() {
                 onViewAttempt={(att) => setViewingAttempt(att)}
                 difficulty={difficulty}
                 onDifficultyChange={handleDifficultyChange}
+                onResetAttempts={handleResetAttempts}
               />
             )}
             

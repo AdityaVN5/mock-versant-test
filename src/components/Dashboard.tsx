@@ -8,6 +8,7 @@ interface DashboardProps {
   onViewAttempt: (attempt: Attempt) => void;
   difficulty: 'easy' | 'medium' | 'hard';
   onDifficultyChange: (diff: 'easy' | 'medium' | 'hard') => void;
+  onResetAttempts: () => void;
 }
 
 export default function Dashboard({ 
@@ -16,7 +17,8 @@ export default function Dashboard({
   attempts, 
   onViewAttempt,
   difficulty,
-  onDifficultyChange
+  onDifficultyChange,
+  onResetAttempts
 }: DashboardProps) {
   return (
     <div className="min-h-screen bg-[var(--color-neutral-base)] flex flex-col items-center justify-start text-[#171717] w-full">
@@ -165,6 +167,15 @@ export default function Dashboard({
                   </div>
                 ))}
               </div>
+            )}
+            
+            {attempts.length > 0 && (
+              <button
+                onClick={onResetAttempts}
+                className="mt-6 w-full py-2.5 border border-dashed border-red-200 hover:bg-red-50 text-red-600 hover:text-red-700 text-[9px] font-bold uppercase tracking-widest transition-colors cursor-pointer"
+              >
+                Clear Practice History
+              </button>
             )}
           </div>
 
