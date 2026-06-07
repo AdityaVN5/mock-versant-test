@@ -31,7 +31,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
               value={username}
               onChange={e => setUsername(e.target.value)}
               className="w-full px-4 py-3 border border-neutral-200 text-sm focus:outline-none focus:border-black transition-colors bg-[var(--color-neutral-base)]"
-              placeholder="vrst_admin"
+              placeholder="Enter username"
             />
           </div>
           <div className="space-y-3">
@@ -42,7 +42,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
               value={password}
               onChange={e => setPassword(e.target.value)}
               className="w-full px-4 py-3 border border-neutral-200 text-sm focus:outline-none focus:border-black transition-colors bg-[var(--color-neutral-base)]"
-              placeholder="xR9$mB4#wP2!sT1y"
+              placeholder="Enter password"
             />
           </div>
           
