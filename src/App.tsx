@@ -29,10 +29,15 @@ const INITIAL_ATTEMPT: Attempt = {
 };
 
 export default function App() {
-  const [status, setStatus] = useState<TestStatus>('login');
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [viewingAttempt, setViewingAttempt] = useState<Attempt | null>(null);
   const [targetSectionId, setTargetSectionId] = useState<string | undefined>(undefined);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem('versant_auth') === 'true';
+  });
+  const [status, setStatus] = useState<TestStatus>(() => {
+    return sessionStorage.getItem('versant_auth') === 'true' ? 'dashboard' : 'login';
+  });
 
   // Initialize attempts from localStorage or default list
   useEffect(() => {
@@ -49,9 +54,61 @@ export default function App() {
     }
   }, []);
 
+  // Synchronize App state from the URL hash
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash || '#login';
+      
+      if (!isAuthenticated) {
+        if (hash !== '#login') {
+          window.location.hash = '#login';
+        }
+        setStatus('login');
+        setViewingAttempt(null);
+        return;
+      }
+
+      if (hash.startsWith('#login')) {
+        window.location.hash = '#dashboard';
+      } else if (hash.startsWith('#dashboard')) {
+        setStatus('dashboard');
+        setViewingAttempt(null);
+        setTargetSectionId(undefined);
+      } else if (hash.startsWith('#test')) {
+        setStatus('testing');
+        setViewingAttempt(null);
+        const params = new URLSearchParams(hash.substring(hash.indexOf('?') !== -1 ? hash.indexOf('?') : hash.length));
+        const section = params.get('section');
+        setTargetSectionId(section || undefined);
+      } else if (hash.startsWith('#results')) {
+        setStatus('completed');
+        const params = new URLSearchParams(hash.substring(hash.indexOf('?') !== -1 ? hash.indexOf('?') : hash.length));
+        const attemptId = params.get('attemptId');
+        if (attemptId) {
+          const found = attempts.find(a => a.id === attemptId);
+          if (found) {
+            setViewingAttempt(found);
+          }
+        }
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    // Initial sync
+    handleHashChange();
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [attempts, isAuthenticated]);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    sessionStorage.setItem('versant_auth', 'true');
+    window.location.hash = '#dashboard';
+  };
+
   const handleStartExam = (sectionId?: string) => {
-    setTargetSectionId(sectionId);
-    setStatus('testing');
+    const hash = sectionId ? `#test?section=${sectionId}` : '#test';
+    window.location.hash = hash;
   };
 
   const handleComplete = async (finalResults: TestResult[]) => {
@@ -98,6 +155,7 @@ export default function App() {
 
     setViewingAttempt(newAttempt);
     setStatus('completed');
+    window.location.hash = `#results?attemptId=${newAttempt.id}`;
     
     // Log results payload for potential whisper/LLM backend processing
     console.log("=== EXAM SUBMITTED TO BACKEND PROXIES ===");
@@ -106,20 +164,18 @@ export default function App() {
   };
 
   const handleBackToDashboard = () => {
-    setViewingAttempt(null);
-    setTargetSectionId(undefined);
-    setStatus('dashboard');
+    window.location.hash = '#dashboard';
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-neutral-base)] text-[#171717] font-sans selection:bg-neutral-200 flex flex-col justify-between">
-      <div className="flex-1 flex flex-col">
+    <div className="h-screen bg-[var(--color-neutral-base)] text-[#171717] font-sans selection:bg-neutral-200 flex flex-col justify-between overflow-hidden">
+      <div className={`flex-1 flex flex-col min-h-0 ${status === 'testing' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
         {/* If the user is currently viewing a specific attempt scorecard */}
         {viewingAttempt ? (
           <Results attempt={viewingAttempt} onBack={handleBackToDashboard} onNavigateToDiagnostics={() => handleStartExam('part-j')} />
         ) : (
           <>
-            {status === 'login' && <Login onLogin={() => setStatus('dashboard')} />}
+            {status === 'login' && <Login onLogin={handleLogin} />}
             
             {status === 'dashboard' && (
               <Dashboard 
@@ -140,7 +196,7 @@ export default function App() {
       </div>
 
       {/* Global persistent Footer on EVERY page */}
-      <footer className="py-8 border-t border-neutral-200 bg-[#FAFAFA] text-center text-xs shrink-0 z-50">
+      <footer className="py-4 border-t border-neutral-200 bg-[#FAFAFA] text-center text-xs shrink-0 z-50">
         <a
           href="https://adityavn.vercel.app/"
           target="_blank"

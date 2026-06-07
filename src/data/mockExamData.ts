@@ -9,7 +9,7 @@ export const mockExamData: ExamData = {
         {
           id: "part-a",
           title: "Part A: Read Aloud",
-          instructionText: "Please read the text displayed on the screen aloud. Speaker will beep to signal you to begin.",
+          instructionText: "Read the passage aloud smoothly and naturally in a clear voice. You will be stopped after 30 seconds. This is not a speed reading test. You may not be able to finish reading the entire passage, but that is okay. When your time is up, you will automatically move on to the next item.",
           itemCountText: "8 Questions",
           skillsTested: "Reading comprehension, pronunciation, word stress, and oral fluency.",
           questions: [
@@ -17,14 +17,14 @@ export const mockExamData: ExamData = {
               id: "a-1",
               type: "speaking",
               promptText: "The local museum is offering free admission this weekend. Visitors can explore a large collection of historical paintings, sculptures, and interactive science displays designed for all ages.",
-              timeLimit: 15,
+              timeLimit: 30,
               displayPrompt: true
             },
             {
               id: "a-2",
               type: "speaking",
               promptText: "Many universities are transitioning to digital library databases. Students can now access thousands of rare manuscript scans directly from their dorm rooms or local cafes.",
-              timeLimit: 15,
+              timeLimit: 30,
               displayPrompt: true
             }
           ]

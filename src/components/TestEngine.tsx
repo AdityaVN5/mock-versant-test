@@ -275,7 +275,9 @@ export default function TestEngine({ onComplete, targetSectionId }: TestEnginePr
       }
 
       // 2. Play Audio
-      if (currentQuestion.type !== 'reading-writing') {
+      const isReadAloud = currentSection.id === 'part-a';
+
+      if (currentQuestion.type !== 'reading-writing' && !isReadAloud) {
         setPhase('playing');
         if (currentQuestion.scenarioText) {
           await playTTS(currentQuestion.scenarioText);
@@ -432,8 +434,8 @@ export default function TestEngine({ onComplete, targetSectionId }: TestEnginePr
   if (!currentQuestion) return null;
 
   return (
-    <div className="min-h-screen flex items-stretch justify-center bg-[var(--color-neutral-base)] text-[#171717] w-full">
-      <div className="w-full bg-white flex flex-col md:flex-row h-screen overflow-hidden">
+    <div className="h-full flex items-stretch justify-center bg-[var(--color-neutral-base)] text-[#171717] w-full">
+      <div className="w-full bg-white flex flex-col md:flex-row h-full overflow-hidden">
         
         {/* Sidebar Tracker */}
         <aside className="hidden md:flex w-80 border-r border-neutral-200 bg-white p-6 flex-col shrink-0 overflow-y-auto">
@@ -725,7 +727,12 @@ export default function TestEngine({ onComplete, targetSectionId }: TestEnginePr
                 )}
 
                 {phase === 'recording' && (
-                  <div className="text-center flex flex-col items-center">
+                  <div className="text-center flex flex-col items-center max-w-2xl mx-auto px-4">
+                    {currentQuestion.displayPrompt && (
+                      <div className="mb-8 p-6 bg-neutral-50 border border-neutral-200 rounded text-left text-xl font-serif text-[#171717] leading-relaxed italic select-none shadow-2xs">
+                        {currentQuestion.promptText}
+                      </div>
+                    )}
                     <div className="w-24 h-24 rounded-full flex items-center justify-center mb-8 relative">
                        {/* Radiating pulse waves */}
                        <div className="absolute inset-0 border-2 border-red-500 rounded-full mic-pulse-ring-1"></div>
@@ -737,7 +744,15 @@ export default function TestEngine({ onComplete, targetSectionId }: TestEnginePr
                        </div>
                     </div>
                     <h2 className="text-4xl font-serif italic mb-4 tracking-tight text-red-650 animate-pulse">"Speak now"</h2>
-                    <p className="text-neutral-400 text-xs uppercase tracking-widest font-bold">Recording in progress</p>
+                    <p className="text-neutral-400 text-xs uppercase tracking-widest font-bold mb-6">Recording in progress</p>
+                    
+                    <button 
+                      onClick={() => handleRecordingComplete(false)}
+                      className="px-6 py-3 border border-neutral-900 bg-white hover:bg-neutral-950 hover:text-white text-neutral-950 text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+                    >
+                      <span>Next Item</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 )}
 
