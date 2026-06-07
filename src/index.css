@@ -7,3 +7,56 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --color-neutral-base: #FAFAFA;
 }
+
+.sound-wave-bar-1 {
+  animation: soundWave 1.2s ease-in-out infinite;
+  animation-delay: 0.1s;
+}
+.sound-wave-bar-2 {
+  animation: soundWave 1.2s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+.sound-wave-bar-3 {
+  animation: soundWave 1.2s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+.sound-wave-bar-4 {
+  animation: soundWave 1.2s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+.sound-wave-bar-5 {
+  animation: soundWave 1.2s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+.mic-pulse-ring-1 {
+  animation: micPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.mic-pulse-ring-2 {
+  animation: micPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation-delay: 0.5s;
+}
+.mic-pulse-ring-3 {
+  animation: micPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation-delay: 1s;
+}
+
+@keyframes soundWave {
+  0%, 100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes micPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}

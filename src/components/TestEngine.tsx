@@ -697,7 +697,14 @@ export default function TestEngine({ onComplete, targetSectionId }: TestEnginePr
 
                 {phase === 'playing' && (
                    <div className="text-center">
-                      <h2 className="text-3xl font-serif italic mb-6 tracking-tight">Listen carefully</h2>
+                      <h2 className="text-3xl font-serif italic mb-2 tracking-tight">Listen carefully</h2>
+                      <div className="flex items-center gap-1.5 mt-8 justify-center h-16">
+                        <span className="w-1 h-6 bg-black rounded-full sound-wave-bar-1 origin-bottom"></span>
+                        <span className="w-1 h-12 bg-black rounded-full sound-wave-bar-2 origin-bottom"></span>
+                        <span className="w-1 h-16 bg-black rounded-full sound-wave-bar-3 origin-bottom"></span>
+                        <span className="w-1 h-8 bg-black rounded-full sound-wave-bar-4 origin-bottom"></span>
+                        <span className="w-1 h-14 bg-black rounded-full sound-wave-bar-5 origin-bottom"></span>
+                      </div>
                       {currentQuestion.displayPrompt && (
                         <p className="mt-8 text-2xl font-serif text-[#171717] leading-relaxed max-w-xl mx-auto break-words px-8">
                           {currentQuestion.promptText.split('________').map((part, i, arr) => 
@@ -719,11 +726,17 @@ export default function TestEngine({ onComplete, targetSectionId }: TestEnginePr
 
                 {phase === 'recording' && (
                   <div className="text-center flex flex-col items-center">
-                    <div className="w-16 h-16 rounded-full border-2 border-black flex items-center justify-center mb-8 relative">
-                       <div className="absolute inset-0 border border-black rounded-full animate-ping opacity-20"></div>
-                       <div className="w-3 h-3 bg-red-500 rounded-sm animate-pulse"></div>
+                    <div className="w-24 h-24 rounded-full flex items-center justify-center mb-8 relative">
+                       {/* Radiating pulse waves */}
+                       <div className="absolute inset-0 border-2 border-red-500 rounded-full mic-pulse-ring-1"></div>
+                       <div className="absolute inset-0 border-2 border-red-400 rounded-full mic-pulse-ring-2"></div>
+                       <div className="absolute inset-0 border-2 border-red-300 rounded-full mic-pulse-ring-3"></div>
+                       {/* Center Mic icon and background */}
+                       <div className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center relative z-10 shadow-lg shadow-red-200">
+                          <Mic className="w-6 h-6 text-white animate-pulse" />
+                       </div>
                     </div>
-                    <h2 className="text-4xl font-serif italic mb-4 tracking-tight">"Speak now"</h2>
+                    <h2 className="text-4xl font-serif italic mb-4 tracking-tight text-red-650 animate-pulse">"Speak now"</h2>
                     <p className="text-neutral-400 text-xs uppercase tracking-widest font-bold">Recording in progress</p>
                   </div>
                 )}
