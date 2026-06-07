@@ -64,5 +64,37 @@ export const PART_D_QUESTIONS: Question[] = [
     promptText: "What solution was suggested to fix the slow computer?",
     timeLimit: 8,
     displayPrompt: false
+  },
+  {
+    id: "d-9",
+    type: "speaking",
+    scenarioText: "Person 1: I need to borrow a blue pen. Person 2: I only have a black pencil.",
+    promptText: "What writing tool does Person 2 have?",
+    timeLimit: 8,
+    displayPrompt: false
+  },
+  {
+    id: "d-10",
+    type: "speaking",
+    scenarioText: "Person 1: Are we meeting on Tuesday or Wednesday? Person 2: The schedule says Thursday at ten.",
+    promptText: "On which day is the meeting scheduled?",
+    timeLimit: 8,
+    displayPrompt: false
+  },
+  {
+    id: "d-11",
+    type: "speaking",
+    scenarioText: "Person 1: The train is delayed by twenty minutes. Person 2: Oh no, I'll miss the first presentation.",
+    promptText: "How long is the train delayed?",
+    timeLimit: 8,
+    displayPrompt: false
+  },
+  {
+    id: "d-12",
+    type: "speaking",
+    scenarioText: "Person 1: Do you prefer coffee or green tea? Person 2: I usually drink water instead.",
+    promptText: "What does Person 2 usually drink?",
+    timeLimit: 8,
+    displayPrompt: false
   }
 ];
