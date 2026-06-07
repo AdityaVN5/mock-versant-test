@@ -32,6 +32,7 @@ export default function App() {
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [viewingAttempt, setViewingAttempt] = useState<Attempt | null>(null);
   const [targetSectionId, setTargetSectionId] = useState<string | undefined>(undefined);
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return sessionStorage.getItem('versant_auth') === 'true';
   });
@@ -74,12 +75,21 @@ export default function App() {
         setStatus('dashboard');
         setViewingAttempt(null);
         setTargetSectionId(undefined);
+        const params = new URLSearchParams(hash.substring(hash.indexOf('?') !== -1 ? hash.indexOf('?') : hash.length));
+        const diff = params.get('difficulty') as 'easy' | 'medium' | 'hard';
+        if (diff) {
+          setDifficulty(diff);
+        }
       } else if (hash.startsWith('#test')) {
         setStatus('testing');
         setViewingAttempt(null);
         const params = new URLSearchParams(hash.substring(hash.indexOf('?') !== -1 ? hash.indexOf('?') : hash.length));
         const section = params.get('section');
+        const diff = params.get('difficulty') as 'easy' | 'medium' | 'hard';
         setTargetSectionId(section || undefined);
+        if (diff) {
+          setDifficulty(diff);
+        }
       } else if (hash.startsWith('#results')) {
         setStatus('completed');
         const params = new URLSearchParams(hash.substring(hash.indexOf('?') !== -1 ? hash.indexOf('?') : hash.length));
@@ -106,8 +116,15 @@ export default function App() {
     window.location.hash = '#dashboard';
   };
 
+  const handleDifficultyChange = (diff: 'easy' | 'medium' | 'hard') => {
+    setDifficulty(diff);
+    window.location.hash = `#dashboard?difficulty=${diff}`;
+  };
+
   const handleStartExam = (sectionId?: string) => {
-    const hash = sectionId ? `#test?section=${sectionId}` : '#test';
+    const hash = sectionId 
+      ? `#test?section=${sectionId}&difficulty=${difficulty}` 
+      : `#test?difficulty=${difficulty}`;
     window.location.hash = hash;
   };
 
@@ -183,10 +200,12 @@ export default function App() {
                 onStartDiagnostic={() => handleStartExam('part-j')}
                 attempts={attempts}
                 onViewAttempt={(att) => setViewingAttempt(att)}
+                difficulty={difficulty}
+                onDifficultyChange={handleDifficultyChange}
               />
             )}
             
-            {status === 'testing' && <TestEngine onComplete={handleComplete} targetSectionId={targetSectionId} />}
+            {status === 'testing' && <TestEngine onComplete={handleComplete} targetSectionId={targetSectionId} difficulty={difficulty} />}
             
             {status === 'completed' && (
               <Results onBack={handleBackToDashboard} onNavigateToDiagnostics={() => handleStartExam('part-j')} />

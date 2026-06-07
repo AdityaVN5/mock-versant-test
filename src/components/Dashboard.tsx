@@ -6,20 +6,51 @@ interface DashboardProps {
   onStartDiagnostic: () => void;
   attempts: Attempt[];
   onViewAttempt: (attempt: Attempt) => void;
+  difficulty: 'easy' | 'medium' | 'hard';
+  onDifficultyChange: (diff: 'easy' | 'medium' | 'hard') => void;
 }
 
-export default function Dashboard({ onStart, onStartDiagnostic, attempts, onViewAttempt }: DashboardProps) {
+export default function Dashboard({ 
+  onStart, 
+  onStartDiagnostic, 
+  attempts, 
+  onViewAttempt,
+  difficulty,
+  onDifficultyChange
+}: DashboardProps) {
   return (
     <div className="min-h-screen bg-[var(--color-neutral-base)] flex flex-col items-center justify-start text-[#171717] w-full">
       <div className="w-full bg-white border-x border-neutral-200 p-8 md:p-12 flex flex-col space-y-12 min-h-screen">
         
         {/* Header */}
-        <header className="border-b border-neutral-200 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <header className="border-b border-neutral-200 pb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-4xl font-serif italic tracking-tight">Versant English Placement Test Practice</h1>
             <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 mt-4 font-bold">Your English Proficiency Portal</p>
           </div>
-          <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-neutral-300">ADMIN CONTROL PORTAL</span>
+          
+          {/* Segmented Toggle Control */}
+          <div className="flex flex-col gap-1.5 shrink-0 select-none">
+            <span className="text-[9px] uppercase font-bold tracking-widest text-neutral-400 font-mono">Exam Difficulty</span>
+            <div className="inline-flex rounded-md p-1 bg-neutral-100 border border-neutral-200">
+              {(['easy', 'medium', 'hard'] as const).map((level) => {
+                const isActive = difficulty === level;
+                return (
+                  <button
+                    key={level}
+                    onClick={() => onDifficultyChange(level)}
+                    className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded transition-all cursor-pointer font-sans ${
+                      isActive 
+                        ? 'bg-black text-white shadow-xs' 
+                        : 'text-neutral-500 hover:text-neutral-900 bg-transparent'
+                    }`}
+                  >
+                    {level}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </header>
 
         <div className="grid lg:grid-cols-3 gap-8">

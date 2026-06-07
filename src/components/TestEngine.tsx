@@ -82,9 +82,10 @@ const SECTION_DEMOS: Record<string, DemoConfig> = {
 interface TestEngineProps {
   onComplete: (results: TestResult[]) => void;
   targetSectionId?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
 }
 
-export default function TestEngine({ onComplete, targetSectionId }: TestEngineProps) {
+export default function TestEngine({ onComplete, targetSectionId, difficulty = 'medium' }: TestEngineProps) {
   const [modIdx, setModIdx] = useState(0);
   const [secIdx, setSecIdx] = useState(0);
   const [qIdx, setQIdx] = useState(0);
@@ -175,7 +176,7 @@ export default function TestEngine({ onComplete, targetSectionId }: TestEnginePr
   const phaseTimerRef = useRef<NodeJS.Timeout | null>(null);
   const skipTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [examData] = useState(() => generateRandomExam(targetSectionId));
+  const [examData] = useState(() => generateRandomExam(targetSectionId, difficulty));
   const currentModule = examData.modules[modIdx];
   
   // Filter sections if a targetSectionId is passed (e.g. 'part-j' diagnostic)

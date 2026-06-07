@@ -98,47 +98,52 @@ export const MASTER_SECTIONS_POOL: Section[] = [
   }
 ];
 
-export function generateRandomExam(targetSectionId?: string): ExamData {
+import { adaptQuestionForDifficulty } from '../../utils/difficulty';
+
+export function generateRandomExam(
+  targetSectionId?: string,
+  difficulty: 'easy' | 'medium' | 'hard' = 'medium'
+): ExamData {
   const allSections: Section[] = [
     {
       ...MASTER_SECTIONS_POOL[0],
-      questions: sampleRandom(PART_A_QUESTIONS, 8)
+      questions: sampleRandom(PART_A_QUESTIONS, 8).map(q => adaptQuestionForDifficulty(q, 'part-a', difficulty))
     },
     {
       ...MASTER_SECTIONS_POOL[1],
-      questions: sampleRandom(PART_B_QUESTIONS, 16)
+      questions: sampleRandom(PART_B_QUESTIONS, 16).map(q => adaptQuestionForDifficulty(q, 'part-b', difficulty))
     },
     {
       ...MASTER_SECTIONS_POOL[2],
-      questions: sampleRandom(PART_C_QUESTIONS, 10)
+      questions: sampleRandom(PART_C_QUESTIONS, 10).map(q => adaptQuestionForDifficulty(q, 'part-c', difficulty))
     },
     {
       ...MASTER_SECTIONS_POOL[3],
-      questions: sampleRandom(PART_D_QUESTIONS, 6)
+      questions: sampleRandom(PART_D_QUESTIONS, 6).map(q => adaptQuestionForDifficulty(q, 'part-d', difficulty))
     },
     {
       ...MASTER_SECTIONS_POOL[4],
-      questions: sampleRandom(PART_E_QUESTIONS, 1)
+      questions: sampleRandom(PART_E_QUESTIONS, 1).map(q => adaptQuestionForDifficulty(q, 'part-e', difficulty))
     },
     {
       ...MASTER_SECTIONS_POOL[5],
-      questions: sampleRandom(PART_F_QUESTIONS, 12)
+      questions: sampleRandom(PART_F_QUESTIONS, 12).map(q => adaptQuestionForDifficulty(q, 'part-f', difficulty))
     },
     {
       ...MASTER_SECTIONS_POOL[6],
-      questions: sampleRandom(PART_G_QUESTIONS, 10)
+      questions: sampleRandom(PART_G_QUESTIONS, 10).map(q => adaptQuestionForDifficulty(q, 'part-g', difficulty))
     },
     {
       ...MASTER_SECTIONS_POOL[7],
-      questions: sampleRandom(PART_H_QUESTIONS, 1)
+      questions: sampleRandom(PART_H_QUESTIONS, 1).map(q => adaptQuestionForDifficulty(q, 'part-h', difficulty))
     },
     {
       ...MASTER_SECTIONS_POOL[8],
-      questions: sampleRandom(PART_I_QUESTIONS, 1)
+      questions: sampleRandom(PART_I_QUESTIONS, 1).map(q => adaptQuestionForDifficulty(q, 'part-i', difficulty))
     },
     {
       ...MASTER_SECTIONS_POOL[9],
-      questions: sampleRandom(PART_J_QUESTIONS, 2)
+      questions: sampleRandom(PART_J_QUESTIONS, 2).map(q => adaptQuestionForDifficulty(q, 'part-j', difficulty))
     }
   ];
 
