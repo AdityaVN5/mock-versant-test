@@ -1,8 +1,6 @@
 # Automated English Language Assessment: The Versant Practice Portal
 An Interactive Speech, Typing, and Writing Diagnostic Environment aligned with the Global Scale of English (GSE) and the Common European Framework of Reference (CEFR).
 
----
-
 ## 1. Abstract & Research Context
 Automated language assessment systems require high-fidelity modeling of acoustic, lexical, and syntactic features to approximate human grading. This application serves as a comprehensive simulation sandbox for the **Versant English Placement Test**. It allows researchers and candidates to examine how time limits, speech rate triggers, cognitive loads, and spelling accuracy translate into standardized proficiency metrics.
 
